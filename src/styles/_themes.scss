@@ -1,0 +1,70 @@
+:root {
+  // =========================
+  // Backgrounds
+  // =========================
+
+  --bg: #F6F7FB;
+  --surface: #FFFFFF;
+  --surface-secondary: #F1F3F9;
+
+  // =========================
+  // Borders
+  // =========================
+
+  --border: #E3E7F0;
+
+  // =========================
+  // Primary
+  // =========================
+
+  --primary: #7C4DFF;
+  --primary-hover: #6D3DF5;
+  --primary-light: #EEE7FF;
+  --primary-dark: #5B2EE0;
+
+  // =========================
+  // Text
+  // =========================
+
+  --text-primary: #151821;
+  --text-secondary: #6B7280;
+  --text-muted: #9CA3AF;
+
+  // =========================
+  // Device
+  // =========================
+
+  --device-on: #FFD76A;
+  --device-on-glow: rgba(255, 215, 106, 0.45);
+  --device-off: #C8CCD6;
+
+  // =========================
+  // States
+  // =========================
+
+  --success: #22C55E;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+}
+
+// ====================================
+// Dark theme
+// ====================================
+
+.dark {
+  --bg: #111318;
+  --surface: #1A1D24;
+  --surface-secondary: #222733;
+
+  --border: #2A2F3A;
+
+  --primary: #9A7BFF;
+  --primary-hover: #8A68FF;
+  --primary-light: rgba(124, 77, 255, 0.12);
+
+  --text-primary: #FFFFFF;
+  --text-secondary: #A3AAB8;
+  --text-muted: #707887;
+
+  --device-off: #4B5563;
+}

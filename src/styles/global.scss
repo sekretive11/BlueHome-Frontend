@@ -1,0 +1,49 @@
+@use './reset';
+@use './variables' as *;
+@use './mixins' as *;
+@use './themes';
+
+body {
+  background: var(--bg);
+  color: var(--text-primary);
+
+  font-family:
+    Inter,
+    system-ui,
+    sans-serif;
+
+  min-height: 100vh;
+
+  transition:
+    background $transition-normal,
+    color $transition-normal;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app {
+  width: 100%;
+  min-height: 100vh;
+}
+
+// =========================
+// Reusable UI
+// =========================
+
+.card {
+  @include card;
+}
+
+.surface {
+  background: var(--surface);
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+.text-muted {
+  color: var(--text-muted);
+}

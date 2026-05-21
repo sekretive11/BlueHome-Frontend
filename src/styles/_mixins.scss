@@ -1,0 +1,110 @@
+@use './variables' as *;
+
+// =========================
+// Flex center
+// =========================
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// =========================
+// Flex between
+// =========================
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+// =========================
+// Card
+// =========================
+
+@mixin card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: $radius-xl;
+  box-shadow: $shadow-card;
+}
+
+// =========================
+// Glass
+// =========================
+
+@mixin glass {
+  backdrop-filter: blur(16px);
+  background: rgba(255,255,255,0.7);
+}
+
+// =========================
+// Transition
+// =========================
+
+@mixin transition {
+  transition:
+    background $transition-normal,
+    border-color $transition-normal,
+    color $transition-normal,
+    transform $transition-normal,
+    opacity $transition-normal;
+}
+
+// =========================
+// Hover scale
+// =========================
+
+@mixin hover-scale {
+  transition: transform $transition-fast;
+
+  &:hover {
+    transform: scale(1.02);
+  }
+}
+
+// =========================
+// Scrollbar
+// =========================
+
+@mixin scrollbar {
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 999px;
+  }
+}
+
+// =========================
+// Lamp glow
+// =========================
+
+@mixin lamp-glow($size: 60px) {
+  box-shadow:
+    0 0 $size var(--device-on-glow);
+}
+
+// =========================
+// Mobile
+// =========================
+
+@mixin mobile {
+  @media (max-width: $mobile) {
+    @content;
+  }
+}
+
+// =========================
+// Tablet
+// =========================
+
+@mixin tablet {
+  @media (max-width: $tablet) {
+    @content;
+  }
+}

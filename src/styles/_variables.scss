@@ -1,0 +1,67 @@
+// =========================
+// Radius
+// =========================
+
+$radius-sm: 10px;
+$radius-md: 16px;
+$radius-lg: 20px;
+$radius-xl: 24px;
+$radius-round: 999px;
+
+// =========================
+// Spacing
+// =========================
+
+$space-2: 2px;
+$space-4: 4px;
+$space-8: 8px;
+$space-12: 12px;
+$space-16: 16px;
+$space-20: 20px;
+$space-24: 24px;
+$space-32: 32px;
+
+// =========================
+// Shadows
+// =========================
+
+$shadow-card:
+  0 4px 12px rgba(15, 23, 42, 0.06);
+
+$shadow-modal:
+  0 12px 32px rgba(15, 23, 42, 0.14);
+
+$shadow-soft:
+  0 2px 8px rgba(15, 23, 42, 0.04);
+
+// =========================
+// Transitions
+// =========================
+
+$transition-fast: 150ms ease;
+$transition-normal: 220ms ease;
+$transition-slow: 320ms ease;
+
+// =========================
+// Z-index
+// =========================
+
+$z-dropdown: 100;
+$z-modal: 200;
+$z-toast: 300;
+
+// =========================
+// Layout
+// =========================
+
+$sidebar-width: 240px;
+$desktop-width: 900px;
+$desktop-height: 700px;
+
+// =========================
+// Breakpoints
+// =========================
+
+$mobile: 480px;
+$tablet: 768px;
+$desktop: 1024px;
