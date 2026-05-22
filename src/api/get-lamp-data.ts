@@ -1,9 +1,4 @@
-/*
+import { getDevice } from "./get-device";
+import type { DeviceDetails } from "./types";
 
-getAll
-get 
-post authoirization + registration
-patch 
-delete
-
-*/
+export const getLampData = (deviceId: number) => getDevice(deviceId) as Promise<DeviceDetails>;
