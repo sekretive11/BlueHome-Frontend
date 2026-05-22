@@ -1,12 +1,13 @@
 import { Home, SearchX } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { ActionButton, Page } from "../../components";
 import "./NotFound.style.scss";
 
 export const NotFound = () => {
     const navigate = useNavigate();
 
     return (
-        <main className="not-found-page">
+        <Page className="not-found-page">
             <section className="not-found-page__content">
                 <div className="not-found-page__icon">
                     <SearchX size={56} />
@@ -19,13 +20,10 @@ export const NotFound = () => {
                 </p>
             </section>
 
-            <button
-                className="not-found-page__home-button"
-                onClick={() => navigate("/home")}
-            >
+            <ActionButton onClick={() => navigate("/home")}>
                 <Home size={20} />
                 на главную
-            </button>
-        </main>
+            </ActionButton>
+        </Page>
     );
 };

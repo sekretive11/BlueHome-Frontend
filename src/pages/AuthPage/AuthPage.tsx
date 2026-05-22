@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Lock, Mail, ShieldCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { server } from "../../api";
+import { ActionButton, Page, TextField } from "../../components";
 import "./AuthPage.style.scss";
 
 export const AuthPage = () => {
@@ -26,7 +27,7 @@ export const AuthPage = () => {
     };
 
     return (
-        <main className="auth-page">
+        <Page className="auth-page">
             <section className="auth-page__hero">
                 <div className="auth-page__icon">
                     <ShieldCheck size={42} />
@@ -43,53 +44,42 @@ export const AuthPage = () => {
                 <label className="auth-page__field">
                     <span className="auth-page__label">почта</span>
 
-                    <span className="auth-page__input-wrap">
-                        <Mail size={20} />
-
-                        <input
-                            className="auth-page__input"
-                            type="email"
-                            value={email}
-                            onChange={(event) => setEmail(event.target.value)}
-                            placeholder="email@example.com"
-                            autoComplete="email"
-                            disabled={isLoading}
-                            required
-                        />
-                    </span>
+                    <TextField
+                        icon={<Mail size={20} />}
+                        type="email"
+                        value={email}
+                        onChange={(event) => setEmail(event.target.value)}
+                        placeholder="email@example.com"
+                        autoComplete="email"
+                        disabled={isLoading}
+                        required
+                    />
                 </label>
 
                 <label className="auth-page__field">
                     <span className="auth-page__label">пароль</span>
 
-                    <span className="auth-page__input-wrap">
-                        <Lock size={20} />
-
-                        <input
-                            className="auth-page__input"
-                            type="password"
-                            value={password}
-                            onChange={(event) =>
-                                setPassword(event.target.value)
-                            }
-                            placeholder="Введите пароль"
-                            autoComplete="current-password"
-                            disabled={isLoading}
-                            required
-                        />
-                    </span>
+                    <TextField
+                        icon={<Lock size={20} />}
+                        type="password"
+                        value={password}
+                        onChange={(event) => setPassword(event.target.value)}
+                        placeholder="Введите пароль"
+                        autoComplete="current-password"
+                        disabled={isLoading}
+                        required
+                    />
                 </label>
 
                 {error && <p className="auth-page__error">{error}</p>}
 
-                <button
-                    className="auth-page__submit"
+                <ActionButton
                     type="submit"
                     disabled={isLoading}
                 >
                     {isLoading ? "входим..." : "войти"}
-                </button>
+                </ActionButton>
             </form>
-        </main>
+        </Page>
     );
 };

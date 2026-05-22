@@ -3,6 +3,16 @@ import { ArrowLeft } from "lucide-react";
 import "./DevicesPage.style.scss";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { server } from "../../api";
+import {
+    ActionButton,
+    EntityCard,
+    IconButton,
+    Page,
+    PageHeader,
+    SelectField,
+    StatusMessage,
+    TextField,
+} from "../../components";
 import type {
     DeviceListItem,
     DeviceType,
@@ -113,34 +123,28 @@ export const DevicesPage = () => {
     };
 
     return (
-        <main className="devices-page">
-            <header className="devices-page__header">
-                <button
-                    className="devices-page__back-button"
-                    onClick={() => navigate(-1)}
-                >
-                    <ArrowLeft />
-                </button>
-
-                <h1 className="devices-page__title">устройства</h1>
-
-                <div className="devices-page__placeholder" />
-            </header>
+        <Page className="devices-page">
+            <PageHeader
+                title="устройства"
+                leftSlot={
+                    <IconButton onClick={() => navigate(-1)}>
+                        <ArrowLeft />
+                    </IconButton>
+                }
+            />
 
             <form
                 className="devices-page__form"
                 onSubmit={(event) => void handleCreateDevice(event)}
             >
-                <input
-                    className="devices-page__input"
+                <TextField
                     value={name}
                     onChange={(event) => setName(event.target.value)}
                     placeholder="Название устройства"
                     disabled={isSubmitting}
                 />
 
-                <select
-                    className="devices-page__input"
+                <SelectField
                     value={type}
                     onChange={(event) => setType(event.target.value as DeviceType)}
                     disabled={isSubmitting}
@@ -150,11 +154,10 @@ export const DevicesPage = () => {
                             {deviceType}
                         </option>
                     ))}
-                </select>
+                </SelectField>
 
                 <div className="devices-page__form-row">
-                    <select
-                        className="devices-page__input"
+                    <SelectField
                         value={spaceId}
                         onChange={(event) => setSpaceId(Number(event.target.value))}
                         disabled={isSubmitting}
@@ -164,10 +167,9 @@ export const DevicesPage = () => {
                                 {space.spaceName}
                             </option>
                         ))}
-                    </select>
+                    </SelectField>
 
-                    <select
-                        className="devices-page__input"
+                    <SelectField
                         value={selectedLocationId}
                         onChange={(event) =>
                             setSelectedLocationId(Number(event.target.value))
@@ -182,49 +184,37 @@ export const DevicesPage = () => {
                                 {location.locationName}
                             </option>
                         ))}
-                    </select>
+                    </SelectField>
                 </div>
 
-                <button
-                    className="devices-page__add-button"
-                    type="submit"
-                    disabled={isSubmitting}
-                >
+                <ActionButton type="submit" disabled={isSubmitting}>
                     {isSubmitting ? "добавляем..." : "+ добавить устройство"}
-                </button>
+                </ActionButton>
             </form>
 
-            {status && <p className="devices-page__status">{status}</p>}
+            {status && <StatusMessage>{status}</StatusMessage>}
 
             <section className="devices-page__content">
                 {isLoading && (
-                    <p className="devices-page__loading">загружаем устройства...</p>
+                    <StatusMessage variant="loading">
+                        загружаем устройства...
+                    </StatusMessage>
                 )}
 
                 {!isLoading && visibleDevices.map((device) => (
-                    <button
+                    <EntityCard
                         key={device.deviceId}
-                        className="devices-page__room-card"
+                        title={device.deviceName}
+                        subtitle={`${device.deviceType} · ${device.status}`}
+                        rightSlot="Открыть"
                         onClick={() => navigate(`/device/${device.deviceId}`)}
-                    >
-                        <div className="devices-page__room-info">
-                            <h2 className="devices-page__room-title">
-                                {device.deviceName}
-                            </h2>
-
-                            <span className="devices-page__room-devices">
-                                {device.deviceType} · {device.status}
-                            </span>
-                        </div>
-
-                        <div className="devices-page__room-arrow">Открыть</div>
-                    </button>
+                    />
                 ))}
 
                 {!isLoading && !visibleDevices.length && (
-                    <p className="devices-page__empty">Устройств пока нет.</p>
+                    <StatusMessage>Устройств пока нет.</StatusMessage>
                 )}
             </section>
-        </main>
+        </Page>
     );
 };

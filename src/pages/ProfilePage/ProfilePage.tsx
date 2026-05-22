@@ -3,6 +3,13 @@ import { useNavigate } from "react-router-dom";
 import "./ProfilePage.style.scss";
 import { ArrowLeft, User } from "lucide-react";
 import { server } from "../../api";
+import {
+    ActionButton,
+    IconButton,
+    Page,
+    PageHeader,
+    StatusMessage,
+} from "../../components";
 import type { User as UserType } from "../../api/server";
 
 export const ProfilePage = () => {
@@ -80,19 +87,15 @@ export const ProfilePage = () => {
     };
 
     return (
-        <main className="profile-page">
-            <header className="profile-page__header">
-                <button
-                    className="profile-page__back-button"
-                    onClick={() => navigate(-1)}
-                >
-                    <ArrowLeft />
-                </button>
-
-                <h1 className="profile-page__title">профиль</h1>
-
-                <div className="profile-page__placeholder" />
-            </header>
+        <Page className="profile-page">
+            <PageHeader
+                title="профиль"
+                leftSlot={
+                    <IconButton onClick={() => navigate(-1)}>
+                        <ArrowLeft />
+                    </IconButton>
+                }
+            />
 
             <section className="profile-page__user-card">
                 <div className="profile-page__avatar">
@@ -109,10 +112,12 @@ export const ProfilePage = () => {
             </section>
 
             {isLoading && (
-                <p className="profile-page__loading">загружаем профиль...</p>
+                <StatusMessage variant="loading">
+                    загружаем профиль...
+                </StatusMessage>
             )}
 
-            {status && <p className="profile-page__status">{status}</p>}
+            {status && <StatusMessage>{status}</StatusMessage>}
 
             <section className="profile-page__stats">
                 {profileStats.map((stat) => (
@@ -129,21 +134,21 @@ export const ProfilePage = () => {
             </section>
 
             <section className="profile-page__actions">
-                <button className="profile-page__action-button">
+                <ActionButton variant="secondary">
                     роль: {user?.roleId ?? "—"}
-                </button>
+                </ActionButton>
 
-                <button className="profile-page__action-button">
+                <ActionButton variant="secondary">
                     user lookup: {checkedUser?.username ?? "недоступно"}
-                </button>
+                </ActionButton>
 
-                <button
-                    className="profile-page__logout-button"
+                <ActionButton
+                    variant="danger"
                     onClick={handleLogout}
                 >
                     выйти из аккаунта
-                </button>
+                </ActionButton>
             </section>
-        </main>
+        </Page>
     );
 };

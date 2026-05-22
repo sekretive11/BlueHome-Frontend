@@ -3,6 +3,15 @@ import { useNavigate } from "react-router-dom";
 import "./SpacePage.style.scss";
 import { ArrowLeft } from "lucide-react";
 import { server } from "../../api";
+import {
+    ActionButton,
+    EntityCard,
+    IconButton,
+    Page,
+    PageHeader,
+    StatusMessage,
+    TextField,
+} from "../../components";
 import type { LocationItem, SpaceItem } from "../../api/server";
 
 export const SpacePage = () => {
@@ -98,84 +107,69 @@ export const SpacePage = () => {
     };
 
     return (
-        <main className="spaces-page">
-            <header className="spaces-page__header">
-                <button
-                    className="spaces-page__back-button"
-                    onClick={() => navigate(-1)}
-                >
-                    <ArrowLeft />
-                </button>
-
-                <h1 className="spaces-page__title">пространства</h1>
-
-                <div className="spaces-page__placeholder" />
-            </header>
+        <Page className="spaces-page">
+            <PageHeader
+                title="пространства"
+                leftSlot={
+                    <IconButton onClick={() => navigate(-1)}>
+                        <ArrowLeft />
+                    </IconButton>
+                }
+            />
 
             <form
                 className="spaces-page__form"
                 onSubmit={(event) => void handleCreateSpace(event)}
             >
-                <input
-                    className="spaces-page__input"
+                <TextField
                     value={name}
                     onChange={(event) => setName(event.target.value)}
                     placeholder="Название пространства"
                     disabled={isSubmitting}
                 />
 
-                <input
-                    className="spaces-page__input"
+                <TextField
                     value={type}
                     onChange={(event) => setType(event.target.value)}
                     placeholder="Тип пространства"
                     disabled={isSubmitting}
                 />
 
-                <button
-                    className="spaces-page__add-button"
-                    type="submit"
-                    disabled={isSubmitting}
-                >
+                <ActionButton type="submit" disabled={isSubmitting}>
                     {isSubmitting ? "добавляем..." : "+ добавить пространство"}
-                </button>
+                </ActionButton>
             </form>
 
-            {status && <p className="spaces-page__status">{status}</p>}
+            {status && <StatusMessage>{status}</StatusMessage>}
 
             <section className="spaces-page__content">
                 {isLoading && (
-                    <p className="spaces-page__loading">загружаем пространства...</p>
+                    <StatusMessage variant="loading">
+                        загружаем пространства...
+                    </StatusMessage>
                 )}
 
                 {!isLoading && spaces.map((space) => (
-                    <button
+                    <EntityCard
                         key={space.spaceId}
-                        className={`spaces-page__space-card ${space.spaceId === activeSpaceId ? "spaces-page__space-card--active" : ""}`}
+                        title={space.spaceName}
+                        subtitle={`комнат: ${roomsBySpace[space.spaceId] ?? 0}`}
+                        active={space.spaceId === activeSpaceId}
+                        rightSlot={
+                            space.spaceId === activeSpaceId ? (
+                                <span className="spaces-page__active-badge">
+                                    active
+                                </span>
+                            ) : undefined
+                        }
                         onClick={() => void handleSelectSpace(space.spaceId)}
-                    >
-                        <div className="spaces-page__space-info">
-                            <h2 className="spaces-page__space-title">
-                                {space.spaceName}
-                            </h2>
-
-                            <span className="spaces-page__space-rooms">
-                                комнат: {roomsBySpace[space.spaceId] ?? 0}
-                            </span>
-                        </div>
-
-                        {space.spaceId === activeSpaceId && (
-                            <div className="spaces-page__active-badge">
-                                active
-                            </div>
-                        )}
-                    </button>
+                    />
                 ))}
 
                 {!isLoading && !spaces.length && (
-                    <p className="spaces-page__empty">Пространств пока нет.</p>
+                    <StatusMessage>Пространств пока нет.</StatusMessage>
                 )}
             </section>
-        </main>
+        </Page>
     );
 };

@@ -1,4 +1,4 @@
-import type { DeviceType } from "./device-types";
+import type { DeviceType } from "./devices/device-types";
 
 export type LoginRequest = {
     email: string;
