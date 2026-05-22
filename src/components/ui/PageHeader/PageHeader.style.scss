@@ -1,0 +1,19 @@
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 36px;
+}
+
+.page-header__title {
+    color: var(--text-primary);
+
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.page-header__placeholder {
+    width: 44px;
+    height: 44px;
+}

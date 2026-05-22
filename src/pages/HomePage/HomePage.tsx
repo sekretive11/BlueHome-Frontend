@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "./HomePage.style.scss";
 import { Menu, User } from "lucide-react";
 import { server } from "../../api";
+import { IconButton, Page, StatusMessage } from "../../components";
 import type { DeviceDetails, DeviceListItem, SpaceItem } from "../../api/server";
 
 export const HomePage = () => {
@@ -125,14 +126,11 @@ export const HomePage = () => {
     }, [enabled, brightness]);
 
     return (
-        <main className="home-page">
+        <Page className="home-page">
             <header className="home-page__header">
-                <button
-                    className="home-page__icon-button"
-                    onClick={() => navigate("/profile")}
-                >
+                <IconButton onClick={() => navigate("/profile")}>
                     <User />
-                </button>
+                </IconButton>
 
                 <button
                     className="home-page__space-button"
@@ -141,20 +139,19 @@ export const HomePage = () => {
                     {space?.spaceName ?? "пространства"}
                 </button>
 
-                <button
-                    className="home-page__icon-button"
-                    onClick={() => navigate("/rooms")}
-                >
+                <IconButton onClick={() => navigate("/rooms")}>
                     <Menu />
-                </button>
+                </IconButton>
             </header>
 
             <section className="home-page__content">
                 {isLoading && (
-                    <p className="home-page__loading">загружаем дом...</p>
+                    <StatusMessage variant="loading">
+                        загружаем дом...
+                    </StatusMessage>
                 )}
 
-                {error && <p className="home-page__status">{error}</p>}
+                {error && <StatusMessage variant="error">{error}</StatusMessage>}
 
                 <div
                     className={`home-page__lamp-wrapper ${enabled ? "home-page__lamp-wrapper--active" : ""}`}
@@ -243,6 +240,6 @@ export const HomePage = () => {
                     </button>
                 </div>
             </section>
-        </main>
+        </Page>
     );
 };

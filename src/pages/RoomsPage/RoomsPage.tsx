@@ -3,6 +3,16 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import "./RoomsPage.style.scss";
 import { useNavigate } from "react-router-dom";
 import { server } from "../../api";
+import {
+    ActionButton,
+    EntityCard,
+    IconButton,
+    Page,
+    PageHeader,
+    SelectField,
+    StatusMessage,
+    TextField,
+} from "../../components";
 import type { DeviceListItem, LocationItem, SpaceItem } from "../../api/server";
 
 export const RoomsPage = () => {
@@ -89,34 +99,28 @@ export const RoomsPage = () => {
     };
 
     return (
-        <main className="rooms-page">
-            <header className="rooms-page__header">
-                <button
-                    className="rooms-page__back-button"
-                    onClick={() => navigate(-1)}
-                >
-                    <ArrowLeft />
-                </button>
-
-                <h1 className="rooms-page__title">комнаты</h1>
-
-                <div className="rooms-page__placeholder" />
-            </header>
+        <Page className="rooms-page">
+            <PageHeader
+                title="комнаты"
+                leftSlot={
+                    <IconButton onClick={() => navigate(-1)}>
+                        <ArrowLeft />
+                    </IconButton>
+                }
+            />
 
             <form
                 className="rooms-page__form"
                 onSubmit={(event) => void handleCreateRoom(event)}
             >
-                <input
-                    className="rooms-page__input"
+                <TextField
                     value={name}
                     onChange={(event) => setName(event.target.value)}
                     placeholder="Название комнаты"
                     disabled={isSubmitting}
                 />
 
-                <select
-                    className="rooms-page__input"
+                <SelectField
                     value={spaceId}
                     onChange={(event) => setSpaceId(Number(event.target.value))}
                     disabled={isSubmitting}
@@ -126,50 +130,36 @@ export const RoomsPage = () => {
                             {space.spaceName}
                         </option>
                     ))}
-                </select>
+                </SelectField>
 
-                <button
-                    className="rooms-page__add-button"
-                    type="submit"
-                    disabled={isSubmitting}
-                >
+                <ActionButton type="submit" disabled={isSubmitting}>
                     {isSubmitting ? "добавляем..." : "+ добавить комнату"}
-                </button>
+                </ActionButton>
             </form>
 
-            {status && <p className="rooms-page__status">{status}</p>}
+            {status && <StatusMessage>{status}</StatusMessage>}
 
             <section className="rooms-page__content">
                 {isLoading && (
-                    <p className="rooms-page__loading">загружаем комнаты...</p>
+                    <StatusMessage variant="loading">
+                        загружаем комнаты...
+                    </StatusMessage>
                 )}
 
                 {!isLoading && rooms.map((room) => (
-                    <button
+                    <EntityCard
                         key={room.locationId}
-                        className="rooms-page__room-card"
+                        title={room.locationName}
+                        subtitle={`устройств: ${getDevicesCount(room.locationId)}`}
+                        rightSlot={<ArrowRight />}
                         onClick={() => void handleOpenRoom(room.locationId)}
-                    >
-                        <div className="rooms-page__room-info">
-                            <h2 className="rooms-page__room-title">
-                                {room.locationName}
-                            </h2>
-
-                            <span className="rooms-page__room-devices">
-                                устройств: {getDevicesCount(room.locationId)}
-                            </span>
-                        </div>
-
-                        <div className="rooms-page__room-arrow">
-                            <ArrowRight />
-                        </div>
-                    </button>
+                    />
                 ))}
 
                 {!isLoading && !rooms.length && (
-                    <p className="rooms-page__empty">Комнат пока нет.</p>
+                    <StatusMessage>Комнат пока нет.</StatusMessage>
                 )}
             </section>
-        </main>
+        </Page>
     );
 };

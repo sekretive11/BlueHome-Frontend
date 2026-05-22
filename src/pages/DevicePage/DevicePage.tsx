@@ -3,6 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import "./DevicePage.style.scss";
 import { server } from "../../api";
+import {
+    ActionButton,
+    IconButton,
+    Page,
+    PageHeader,
+    SelectField,
+    StatusMessage,
+} from "../../components";
 import type { DeviceDetails, LocationItem, SpaceItem } from "../../api/server";
 
 export const DevicePage = () => {
@@ -173,19 +181,15 @@ export const DevicePage = () => {
     };
 
     return (
-        <main className="device-info-page">
-            <header className="device-info-page__header">
-                <button
-                    className="device-info-page__back-button"
-                    onClick={() => navigate(-1)}
-                >
+        <Page className="device-info-page">
+            <PageHeader
+                title="устройство"
+                leftSlot={
+                    <IconButton onClick={() => navigate(-1)}>
                     ←
-                </button>
-
-                <h1 className="device-info-page__title">устройство</h1>
-
-                <div className="device-info-page__placeholder" />
-            </header>
+                    </IconButton>
+                }
+            />
 
             <section className="device-info-page__device-card">
                 <div className="device-info-page__lamp-wrapper">
@@ -204,10 +208,12 @@ export const DevicePage = () => {
             </section>
 
             {isLoading && (
-                <p className="device-info-page__loading">загружаем устройство...</p>
+                <StatusMessage variant="loading">
+                    загружаем устройство...
+                </StatusMessage>
             )}
 
-            {status && <p className="device-info-page__status">{status}</p>}
+            {status && <StatusMessage>{status}</StatusMessage>}
 
             <section className="device-info-page__info-list">
                 {deviceInfo.map((item) => (
@@ -224,8 +230,7 @@ export const DevicePage = () => {
             </section>
 
             <section className="device-info-page__move-list">
-                <select
-                    className="device-info-page__select"
+                <SelectField
                     value={device?.spaceId ?? 0}
                     disabled={isLoading || isActionLoading || !device}
                     onChange={(event) =>
@@ -237,10 +242,9 @@ export const DevicePage = () => {
                             {space.spaceName}
                         </option>
                     ))}
-                </select>
+                </SelectField>
 
-                <select
-                    className="device-info-page__select"
+                <SelectField
                     value={device?.locationId ?? 0}
                     disabled={isLoading || isActionLoading || !device}
                     onChange={(event) =>
@@ -255,7 +259,7 @@ export const DevicePage = () => {
                             {location.locationName}
                         </option>
                     ))}
-                </select>
+                </SelectField>
             </section>
 
             {isLamp && (
@@ -274,33 +278,29 @@ export const DevicePage = () => {
                     />
 
                     <div className="device-info-page__power-row">
-                        <button
-                            className="device-info-page__primary-button"
+                        <ActionButton
                             disabled={isLoading || isActionLoading}
                             onClick={() => void handleLampPower(true)}
                         >
                             {isActionLoading ? "..." : "включить"}
-                        </button>
+                        </ActionButton>
 
-                        <button
-                            className="device-info-page__danger-button"
+                        <ActionButton
+                            variant="danger"
                             disabled={isLoading || isActionLoading}
                             onClick={() => void handleLampPower(false)}
                         >
                             {isActionLoading ? "..." : "выключить"}
-                        </button>
+                        </ActionButton>
                     </div>
                 </section>
             )}
 
             <section className="device-info-page__actions">
-                <button
-                    className="device-info-page__primary-button"
-                    onClick={() => navigate("/devices")}
-                >
+                <ActionButton onClick={() => navigate("/devices")}>
                     все устройства
-                </button>
+                </ActionButton>
             </section>
-        </main>
+        </Page>
     );
 };
