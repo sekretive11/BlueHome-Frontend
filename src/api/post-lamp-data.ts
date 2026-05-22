@@ -1,22 +1,22 @@
-export const postLampData = async (
+import { setLampBrightness } from "./set-lamp-brightness";
+import { turnLampOff } from "./turn-lamp-off";
+import { turnLampOn } from "./turn-lamp-on";
+
+export const postLampData = (
     deviceId: number,
-    eventType: "DevicePoweredOffEvent" | "DevicePoweredOnEvent" | "DeviceBrightnessChanged",
-    description: "Device powered On" | "Device powered Off" | `Device set to ${}`,
+    action: "on" | "off" | "brightness",
+    brightness?: number,
 ) => {
-    try {
-        const response = await fetch(`/api/lamp/${deviceId}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ description,  eventType }),
-        });
-
-        if (!response.ok) {
-            throw new Error(`Failed to post lamp data: ${response.statusText}`);
-        }
-
-        return await response.json();
-    } catch (error) {
-        console.error("Error posting lamp data:", error);
-        throw error;
+    if (action === "on") {
+        return turnLampOn(deviceId);
     }
+
+    if (action === "off") {
+        return turnLampOff(deviceId);
+    }
+
+    return setLampBrightness({
+        deviceId,
+        brightness: brightness ?? 50,
+    });
 };

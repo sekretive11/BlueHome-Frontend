@@ -117,6 +117,27 @@
   margin-bottom: 28px;
 }
 
+.profile-page__status,
+.profile-page__loading {
+  margin-bottom: 16px;
+
+  color: var(--text-secondary);
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.profile-page__loading {
+  padding: 14px 16px;
+
+  border-radius: 18px;
+  border: 1px solid var(--border);
+
+  background: var(--surface-secondary);
+
+  text-align: center;
+}
+
 .profile-page__stat-card {
   padding: 20px 12px;
 

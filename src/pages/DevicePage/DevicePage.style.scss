@@ -130,7 +130,28 @@
   flex-direction: column;
   gap: 14px;
 
-  margin-bottom: 28px;
+  margin-bottom: 18px;
+}
+
+.device-info-page__status,
+.device-info-page__loading {
+  margin-bottom: 16px;
+
+  color: var(--text-secondary);
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.device-info-page__loading {
+  padding: 14px 16px;
+
+  border-radius: 18px;
+  border: 1px solid var(--border);
+
+  background: var(--surface-secondary);
+
+  text-align: center;
 }
 
 .device-info-page__info-card {
@@ -159,6 +180,69 @@
 
   font-size: 15px;
   font-weight: 700;
+}
+
+.device-info-page__move-list,
+.device-info-page__lamp-actions {
+  margin-bottom: 18px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.device-info-page__select {
+  width: 100%;
+  height: 52px;
+
+  padding: 0 16px;
+
+  border-radius: 18px;
+  border: 1px solid var(--border);
+
+  background: var(--surface-secondary);
+  color: var(--text-primary);
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.device-info-page__select:disabled,
+.device-info-page__range:disabled,
+.device-info-page__primary-button:disabled,
+.device-info-page__danger-button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.device-info-page__range {
+  width: 100%;
+  height: 8px;
+
+  appearance: none;
+
+  border-radius: 999px;
+  background: var(--border);
+}
+
+.device-info-page__range::-webkit-slider-thumb {
+  appearance: none;
+
+  width: 22px;
+  height: 22px;
+
+  border-radius: 999px;
+  border: 4px solid var(--primary);
+
+  background: #FFFFFF;
+
+  cursor: pointer;
+}
+
+.device-info-page__power-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
 }
 
 .device-info-page__actions {

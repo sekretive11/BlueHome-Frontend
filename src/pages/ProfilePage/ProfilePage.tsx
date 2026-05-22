@@ -1,26 +1,83 @@
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./ProfilePage.style.scss";
-
-const profileStats = [
-    {
-        id: 1,
-        label: "пространств",
-        value: 3,
-    },
-    {
-        id: 2,
-        label: "комнат",
-        value: 8,
-    },
-    {
-        id: 3,
-        label: "устройств",
-        value: 24,
-    },
-];
+import { ArrowLeft, User } from "lucide-react";
+import { server } from "../../api";
+import type { User as UserType } from "../../api/server";
 
 export const ProfilePage = () => {
     const navigate = useNavigate();
+    const [user, setUser] = useState<UserType | null>(null);
+    const [checkedUser, setCheckedUser] = useState<UserType | null>(null);
+    const [spacesCount, setSpacesCount] = useState(0);
+    const [roomsCount, setRoomsCount] = useState(0);
+    const [devicesCount, setDevicesCount] = useState(0);
+    const [status, setStatus] = useState("");
+    const [isLoading, setIsLoading] = useState(true);
+
+    const profileStats = useMemo(
+        () => [
+            {
+                id: 1,
+                label: "пространств",
+                value: spacesCount,
+            },
+            {
+                id: 2,
+                label: "комнат",
+                value: roomsCount,
+            },
+            {
+                id: 3,
+                label: "устройств",
+                value: devicesCount,
+            },
+        ],
+        [devicesCount, roomsCount, spacesCount],
+    );
+
+    const loadProfile = async () => {
+        setStatus("");
+        setIsLoading(true);
+
+        try {
+            const [nextUser, spaces, rooms, devices] = await Promise.all([
+                server.getMe(),
+                server.getSpaces(),
+                server.getLocations(),
+                server.getDevices(),
+            ]);
+
+            setUser(nextUser);
+            setSpacesCount(spaces.length);
+            setRoomsCount(rooms.length);
+            setDevicesCount(devices.length);
+
+            if (nextUser.roleId === 1) {
+                const userDetails = await server.getUser(2);
+                setCheckedUser(userDetails);
+            } else {
+                setCheckedUser(null);
+            }
+        } catch {
+            setStatus("Не удалось загрузить профиль.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        const timeoutId = window.setTimeout(() => {
+            void loadProfile();
+        }, 0);
+
+        return () => window.clearTimeout(timeoutId);
+    }, []);
+
+    const handleLogout = () => {
+        server.removeAccessToken();
+        navigate("/auth", { replace: true });
+    };
 
     return (
         <main className="profile-page">
@@ -29,7 +86,7 @@ export const ProfilePage = () => {
                     className="profile-page__back-button"
                     onClick={() => navigate(-1)}
                 >
-                    ←
+                    <ArrowLeft />
                 </button>
 
                 <h1 className="profile-page__title">профиль</h1>
@@ -38,12 +95,24 @@ export const ProfilePage = () => {
             </header>
 
             <section className="profile-page__user-card">
-                <div className="profile-page__avatar">👤</div>
+                <div className="profile-page__avatar">
+                    <User size={50} />
+                </div>
 
-                <h2 className="profile-page__name">Дмитрий</h2>
+                <h2 className="profile-page__name">
+                    {isLoading ? "загрузка..." : user?.username ?? "Пользователь"}
+                </h2>
 
-                <span className="profile-page__email">dmitry@example.com</span>
+                <span className="profile-page__email">
+                    {isLoading ? "получаем данные" : user?.email ?? "email не найден"}
+                </span>
             </section>
+
+            {isLoading && (
+                <p className="profile-page__loading">загружаем профиль...</p>
+            )}
+
+            {status && <p className="profile-page__status">{status}</p>}
 
             <section className="profile-page__stats">
                 {profileStats.map((stat) => (
@@ -61,14 +130,17 @@ export const ProfilePage = () => {
 
             <section className="profile-page__actions">
                 <button className="profile-page__action-button">
-                    настройки
+                    роль: {user?.roleId ?? "—"}
                 </button>
 
                 <button className="profile-page__action-button">
-                    уведомления
+                    user lookup: {checkedUser?.username ?? "недоступно"}
                 </button>
 
-                <button className="profile-page__logout-button">
+                <button
+                    className="profile-page__logout-button"
+                    onClick={handleLogout}
+                >
                     выйти из аккаунта
                 </button>
             </section>

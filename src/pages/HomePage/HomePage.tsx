@@ -1,11 +1,112 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./HomePage.style.scss";
+import { Menu, User } from "lucide-react";
+import { server } from "../../api";
+import type { DeviceDetails, DeviceListItem, SpaceItem } from "../../api/server";
 
 export const HomePage = () => {
     const [enabled, setEnabled] = useState(true);
     const [brightness, setBrightness] = useState(65);
+    const [device, setDevice] = useState<DeviceDetails | null>(null);
+    const [space, setSpace] = useState<SpaceItem | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isActionLoading, setIsActionLoading] = useState(false);
+    const [error, setError] = useState("");
     const navigate = useNavigate();
+
+    const loadDashboard = async () => {
+        setError("");
+        setIsLoading(true);
+
+        try {
+            const [devices, spaces] = await Promise.all([
+                server.getDevices(),
+                server.getSpaces(),
+            ]);
+            const lamp = devices.find(
+                (item: DeviceListItem) => item.deviceType === "Lamp",
+            );
+            const nextDevice = lamp ? await server.getDevice(lamp.deviceId) : null;
+
+            setDevice(nextDevice);
+            setSpace(
+                spaces.find((item) => item.spaceId === nextDevice?.spaceId) ??
+                    spaces[0] ??
+                    null,
+            );
+
+            if (nextDevice) {
+                setEnabled(nextDevice.isOn);
+                setBrightness(nextDevice.brightness);
+            }
+        } catch {
+            setError("Не удалось загрузить устройства.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        const timeoutId = window.setTimeout(() => {
+            void loadDashboard();
+        }, 0);
+
+        return () => window.clearTimeout(timeoutId);
+    }, []);
+
+    const syncDevice = async (deviceId: number) => {
+        const nextDevice = await server.getDevice(deviceId);
+
+        setDevice(nextDevice);
+        setEnabled(nextDevice.isOn);
+        setBrightness(nextDevice.brightness);
+    };
+
+    const handlePowerChange = async (nextEnabled: boolean) => {
+        if (!device) {
+            return;
+        }
+
+        setEnabled(nextEnabled);
+        setIsActionLoading(true);
+
+        try {
+            if (nextEnabled) {
+                await server.turnLampOn(device.deviceId);
+            } else {
+                await server.turnLampOff(device.deviceId);
+            }
+
+            await syncDevice(device.deviceId);
+        } catch {
+            setError("Не удалось изменить состояние лампы.");
+            setEnabled(device.isOn);
+        } finally {
+            setIsActionLoading(false);
+        }
+    };
+
+    const handleBrightnessCommit = async () => {
+        if (!device || !enabled) {
+            return;
+        }
+
+        setIsActionLoading(true);
+
+        try {
+            await server.setLampBrightness({
+                deviceId: device.deviceId,
+                brightness,
+            });
+            await syncDevice(device.deviceId);
+        } catch {
+            setError("Не удалось изменить яркость.");
+            setBrightness(device.brightness);
+        } finally {
+            setIsActionLoading(false);
+        }
+    };
 
     const lampStyle = useMemo(() => {
         const opacity = enabled ? 0.45 + brightness / 180 : 0.2;
@@ -30,25 +131,31 @@ export const HomePage = () => {
                     className="home-page__icon-button"
                     onClick={() => navigate("/profile")}
                 >
-                    👤
+                    <User />
                 </button>
 
                 <button
                     className="home-page__space-button"
                     onClick={() => navigate("/spaces")}
                 >
-                    пространство 1
+                    {space?.spaceName ?? "пространства"}
                 </button>
 
                 <button
                     className="home-page__icon-button"
                     onClick={() => navigate("/rooms")}
                 >
-                    ☰
+                    <Menu />
                 </button>
             </header>
 
             <section className="home-page__content">
+                {isLoading && (
+                    <p className="home-page__loading">загружаем дом...</p>
+                )}
+
+                {error && <p className="home-page__status">{error}</p>}
+
                 <div
                     className={`home-page__lamp-wrapper ${enabled ? "home-page__lamp-wrapper--active" : ""}`}
                     style={{
@@ -60,11 +167,21 @@ export const HomePage = () => {
                     <div
                         className={`home-page__lamp ${enabled ? "home-page__lamp--enabled" : "home-page__lamp--disabled"}`}
                         style={lampStyle}
-                        onClick={() => navigate("/device")}
+                        onClick={() => {
+                            if (device) {
+                                navigate(`/device/${device.deviceId}`);
+                            }
+                        }}
                     >
                         💡
                     </div>
                 </div>
+
+                <h2 className="home-page__device-title">
+                    {isLoading
+                        ? "загрузка..."
+                        : device?.deviceName ?? "лампа не найдена"}
+                </h2>
 
                 <div className="home-page__slider-block">
                     <div className="home-page__slider-header">
@@ -76,7 +193,7 @@ export const HomePage = () => {
                     </div>
 
                     <input
-                        disabled={!enabled}
+                        disabled={!enabled || isLoading || isActionLoading}
                         className="home-page__slider"
                         type="range"
                         min="0"
@@ -85,6 +202,9 @@ export const HomePage = () => {
                         onChange={(event) => {
                             setBrightness(Number(event.target.value));
                         }}
+                        onMouseUp={() => void handleBrightnessCommit()}
+                        onTouchEnd={() => void handleBrightnessCommit()}
+                        onBlur={() => void handleBrightnessCommit()}
                         style={{
                             background: enabled
                                 ? `linear-gradient(
@@ -108,14 +228,16 @@ export const HomePage = () => {
 
                     <button
                         className="home-page__toggle-option"
-                        onClick={() => setEnabled(true)}
+                        disabled={isLoading || isActionLoading || !device}
+                        onClick={() => void handlePowerChange(true)}
                     >
                         ВКЛ
                     </button>
 
                     <button
                         className="home-page__toggle-option"
-                        onClick={() => setEnabled(false)}
+                        disabled={isLoading || isActionLoading || !device}
+                        onClick={() => void handlePowerChange(false)}
                     >
                         ВЫКЛ
                     </button>
