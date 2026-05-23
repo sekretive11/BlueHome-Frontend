@@ -4,3 +4,4 @@ export * from "./get-devices";
 export * from "./move-device-to-location";
 export * from "./move-device-to-space";
 export * from "./register-device";
+export * from "./get-devices-by-location";

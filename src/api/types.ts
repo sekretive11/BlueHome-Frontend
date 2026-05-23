@@ -50,8 +50,6 @@ export type DeviceDetails = {
     deviceName: string;
     deviceType: DeviceType | string;
     status: string;
-    isOn: boolean;
-    brightness: number;
 };
 
 export type LampActionResponse = {

@@ -241,3 +241,11 @@
     .home-page__toggle-option:last-of-type {
     color: #ffffff;
 }
+.arrow {
+    cursor: pointer;
+    transition: opacity 0.2s;
+
+    &:hover {
+        opacity: 0.5;
+    }
+}

@@ -12,6 +12,7 @@ import {
     StatusMessage,
 } from "../../components";
 import type { DeviceDetails, LocationItem, SpaceItem } from "../../api/server";
+import { ArrowLeft } from "lucide-react";
 
 export const DevicePage = () => {
     const navigate = useNavigate();
@@ -29,6 +30,7 @@ export const DevicePage = () => {
         setIsLoading(true);
 
         try {
+            
             const [devices, nextSpaces, nextLocations] = await Promise.all([
                 server.getDevices(),
                 server.getSpaces(),
@@ -36,7 +38,8 @@ export const DevicePage = () => {
             ]);
             const requestedId = Number(id);
             const deviceId =
-                requestedId || devices.find((item) => item.deviceType === "Lamp")?.deviceId;
+                requestedId ||
+                devices.find((item) => item.deviceType === "Lamp")?.deviceId;
 
             if (!deviceId) {
                 setDevice(null);
@@ -186,7 +189,7 @@ export const DevicePage = () => {
                 title="устройство"
                 leftSlot={
                     <IconButton onClick={() => navigate(-1)}>
-                    ←
+                        <ArrowLeft />
                     </IconButton>
                 }
             />
@@ -199,11 +202,13 @@ export const DevicePage = () => {
                 <h2 className="device-info-page__device-name">
                     {isLoading
                         ? "загрузка..."
-                        : device?.deviceName ?? "устройство не найдено"}
+                        : (device?.deviceName ?? "устройство не найдено")}
                 </h2>
 
                 <span className="device-info-page__device-subtitle">
-                    {isLoading ? "получаем данные" : device?.deviceType ?? "нет данных"}
+                    {isLoading
+                        ? "получаем данные"
+                        : (device?.deviceType ?? "нет данных")}
                 </span>
             </section>
 
@@ -271,7 +276,9 @@ export const DevicePage = () => {
                         max="99"
                         value={brightness}
                         disabled={isLoading || isActionLoading}
-                        onChange={(event) => setBrightness(Number(event.target.value))}
+                        onChange={(event) =>
+                            setBrightness(Number(event.target.value))
+                        }
                         onMouseUp={() => void handleBrightnessCommit()}
                         onTouchEnd={() => void handleBrightnessCommit()}
                         onBlur={() => void handleBrightnessCommit()}

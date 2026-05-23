@@ -71,14 +71,11 @@ export const AuthPage = () => {
                     />
                 </label>
 
-                {error && <p className="auth-page__error">{error}</p>}
-
-                <ActionButton
-                    type="submit"
-                    disabled={isLoading}
-                >
+                <ActionButton type="submit" disabled={isLoading}>
                     {isLoading ? "входим..." : "войти"}
                 </ActionButton>
+                
+                {error && <p className="auth-page__error">{error}</p>}
             </form>
         </Page>
     );

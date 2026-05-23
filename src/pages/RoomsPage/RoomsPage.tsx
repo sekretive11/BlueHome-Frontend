@@ -109,7 +109,7 @@ export const RoomsPage = () => {
                 }
             />
 
-            <form
+            {!isLoading && <form
                 className="rooms-page__form"
                 onSubmit={(event) => void handleCreateRoom(event)}
             >
@@ -132,10 +132,13 @@ export const RoomsPage = () => {
                     ))}
                 </SelectField>
 
-                <ActionButton type="submit" disabled={isSubmitting}>
+                <ActionButton
+                    type="submit"
+                    disabled={isSubmitting}
+                >
                     {isSubmitting ? "добавляем..." : "+ добавить комнату"}
                 </ActionButton>
-            </form>
+            </form>}
 
             {status && <StatusMessage>{status}</StatusMessage>}
 
@@ -146,15 +149,16 @@ export const RoomsPage = () => {
                     </StatusMessage>
                 )}
 
-                {!isLoading && rooms.map((room) => (
-                    <EntityCard
-                        key={room.locationId}
-                        title={room.locationName}
-                        subtitle={`устройств: ${getDevicesCount(room.locationId)}`}
-                        rightSlot={<ArrowRight />}
-                        onClick={() => void handleOpenRoom(room.locationId)}
-                    />
-                ))}
+                {!isLoading &&
+                    rooms.map((room) => (
+                        <EntityCard
+                            key={room.locationId}
+                            title={room.locationName}
+                            subtitle={`устройств: ${getDevicesCount(room.locationId)}`}
+                            rightSlot={<ArrowRight />}
+                            onClick={() => void handleOpenRoom(room.locationId)}
+                        />
+                    ))}
 
                 {!isLoading && !rooms.length && (
                     <StatusMessage>Комнат пока нет.</StatusMessage>

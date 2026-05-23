@@ -18,12 +18,15 @@ export const SpacePage = () => {
     const navigate = useNavigate();
     const [spaces, setSpaces] = useState<SpaceItem[]>([]);
     const [locations, setLocations] = useState<LocationItem[]>([]);
-    const [activeSpaceId, setActiveSpaceId] = useState(0);
+
     const [name, setName] = useState("");
     const [type, setType] = useState("");
     const [status, setStatus] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const spaceId = Number(sessionStorage.getItem("currentSpace"));
+    const [activeSpaceId, setActiveSpaceId] = useState(spaceId);
 
     const loadData = async (showLoader = true) => {
         setStatus("");
@@ -40,7 +43,6 @@ export const SpacePage = () => {
 
             setSpaces(nextSpaces);
             setLocations(nextLocations);
-            setActiveSpaceId((current) => current || nextSpaces[0]?.spaceId || 0);
         } catch {
             setStatus("Не удалось загрузить пространства.");
         } finally {
@@ -72,7 +74,12 @@ export const SpacePage = () => {
         try {
             const space = await server.getSpace(spaceId);
             setActiveSpaceId(space.spaceId);
-            setStatus(`Выбрано: ${space.spaceName}`);
+            sessionStorage.setItem(
+                "currentSpace",
+                JSON.stringify(space.spaceId),
+            );
+            sessionStorage.removeItem("currentLocation");
+            sessionStorage.removeItem("currentDevice");
         } catch {
             setStatus("Пространство не найдено.");
         }
@@ -97,7 +104,6 @@ export const SpacePage = () => {
             setName("");
             setType("");
             setActiveSpaceId(space.id);
-            setStatus("Пространство добавлено.");
             await loadData(false);
         } catch {
             setStatus("Не удалось добавить пространство.");
@@ -125,17 +131,20 @@ export const SpacePage = () => {
                     value={name}
                     onChange={(event) => setName(event.target.value)}
                     placeholder="Название пространства"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || isLoading}
                 />
 
                 <TextField
                     value={type}
                     onChange={(event) => setType(event.target.value)}
                     placeholder="Тип пространства"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || isLoading}
                 />
 
-                <ActionButton type="submit" disabled={isSubmitting}>
+                <ActionButton
+                    type="submit"
+                    disabled={isSubmitting || isLoading}
+                >
                     {isSubmitting ? "добавляем..." : "+ добавить пространство"}
                 </ActionButton>
             </form>
@@ -149,22 +158,25 @@ export const SpacePage = () => {
                     </StatusMessage>
                 )}
 
-                {!isLoading && spaces.map((space) => (
-                    <EntityCard
-                        key={space.spaceId}
-                        title={space.spaceName}
-                        subtitle={`комнат: ${roomsBySpace[space.spaceId] ?? 0}`}
-                        active={space.spaceId === activeSpaceId}
-                        rightSlot={
-                            space.spaceId === activeSpaceId ? (
-                                <span className="spaces-page__active-badge">
-                                    active
-                                </span>
-                            ) : undefined
-                        }
-                        onClick={() => void handleSelectSpace(space.spaceId)}
-                    />
-                ))}
+                {!isLoading &&
+                    spaces.map((space) => (
+                        <EntityCard
+                            key={space.spaceId}
+                            title={space.spaceName}
+                            subtitle={`комнат: ${roomsBySpace[space.spaceId] ?? 0}`}
+                            active={space.spaceId === activeSpaceId}
+                            rightSlot={
+                                space.spaceId === activeSpaceId ? (
+                                    <span className="spaces-page__active-badge">
+                                        active
+                                    </span>
+                                ) : undefined
+                            }
+                            onClick={() =>
+                                void handleSelectSpace(space.spaceId)
+                            }
+                        />
+                    ))}
 
                 {!isLoading && !spaces.length && (
                     <StatusMessage>Пространств пока нет.</StatusMessage>
