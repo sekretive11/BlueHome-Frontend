@@ -30,7 +30,7 @@ export const DevicePage = () => {
         setIsLoading(true);
 
         try {
-            
+
             const [devices, nextSpaces, nextLocations] = await Promise.all([
                 server.getDevices(),
                 server.getSpaces(),
@@ -50,8 +50,9 @@ export const DevicePage = () => {
 
             const nextDevice = await server.getDevice(deviceId);
 
+            if (nextDevice?.brightness) setBrightness(nextDevice?.brightness);
+
             setDevice(nextDevice);
-            setBrightness(nextDevice.brightness);
             setSpaces(nextSpaces);
             setLocations(nextLocations);
         } catch {
@@ -109,7 +110,6 @@ export const DevicePage = () => {
 
             const nextDevice = await server.getDevice(device.deviceId);
             setDevice(nextDevice);
-            setStatus(nextEnabled ? "Лампа включена." : "Лампа выключена.");
         } catch {
             setStatus("Не удалось изменить состояние лампы.");
         } finally {
@@ -131,7 +131,6 @@ export const DevicePage = () => {
             });
             const nextDevice = await server.getDevice(device.deviceId);
             setDevice(nextDevice);
-            setStatus("Яркость обновлена.");
         } catch {
             setStatus("Не удалось обновить яркость.");
         } finally {
@@ -153,7 +152,6 @@ export const DevicePage = () => {
             });
             const nextDevice = await server.getDevice(device.deviceId);
             setDevice(nextDevice);
-            setStatus("Пространство обновлено.");
         } catch {
             setStatus("Не удалось переместить устройство.");
         } finally {
@@ -175,7 +173,6 @@ export const DevicePage = () => {
             });
             const nextDevice = await server.getDevice(device.deviceId);
             setDevice(nextDevice);
-            setStatus("Комната обновлена.");
         } catch {
             setStatus("Не удалось переместить устройство.");
         } finally {
@@ -212,102 +209,111 @@ export const DevicePage = () => {
                 </span>
             </section>
 
-            {isLoading && (
+            {status && <StatusMessage>{status}</StatusMessage>}
+
+            {isLoading ? (
                 <StatusMessage variant="loading">
                     загружаем устройство...
                 </StatusMessage>
-            )}
+            ) : (
+                <>
+                    <section className="device-info-page__info-list">
+                        {deviceInfo.map((item) => (
+                            <div
+                                key={item.id}
+                                className="device-info-page__info-card"
+                            >
+                                <span className="device-info-page__info-label">
+                                    {item.label}
+                                </span>
 
-            {status && <StatusMessage>{status}</StatusMessage>}
+                                <span className="device-info-page__info-value">
+                                    {item.value}
+                                </span>
+                            </div>
+                        ))}
+                    </section>
 
-            <section className="device-info-page__info-list">
-                {deviceInfo.map((item) => (
-                    <div key={item.id} className="device-info-page__info-card">
-                        <span className="device-info-page__info-label">
-                            {item.label}
-                        </span>
-
-                        <span className="device-info-page__info-value">
-                            {item.value}
-                        </span>
-                    </div>
-                ))}
-            </section>
-
-            <section className="device-info-page__move-list">
-                <SelectField
-                    value={device?.spaceId ?? 0}
-                    disabled={isLoading || isActionLoading || !device}
-                    onChange={(event) =>
-                        void handleMoveSpace(Number(event.target.value))
-                    }
-                >
-                    {spaces.map((space) => (
-                        <option key={space.spaceId} value={space.spaceId}>
-                            {space.spaceName}
-                        </option>
-                    ))}
-                </SelectField>
-
-                <SelectField
-                    value={device?.locationId ?? 0}
-                    disabled={isLoading || isActionLoading || !device}
-                    onChange={(event) =>
-                        void handleMoveLocation(Number(event.target.value))
-                    }
-                >
-                    {locations.map((location) => (
-                        <option
-                            key={location.locationId}
-                            value={location.locationId}
+                    <section className="device-info-page__move-list">
+                        <SelectField
+                            value={device?.spaceId ?? 0}
+                            disabled={isLoading || isActionLoading || !device}
+                            onChange={(event) =>
+                                void handleMoveSpace(Number(event.target.value))
+                            }
                         >
-                            {location.locationName}
-                        </option>
-                    ))}
-                </SelectField>
-            </section>
+                            {spaces.map((space) => (
+                                <option
+                                    key={space.spaceId}
+                                    value={space.spaceId}
+                                >
+                                    {space.spaceName}
+                                </option>
+                            ))}
+                        </SelectField>
 
-            {isLamp && (
-                <section className="device-info-page__lamp-actions">
-                    <input
-                        className="device-info-page__range"
-                        type="range"
-                        min="0"
-                        max="99"
-                        value={brightness}
-                        disabled={isLoading || isActionLoading}
-                        onChange={(event) =>
-                            setBrightness(Number(event.target.value))
-                        }
-                        onMouseUp={() => void handleBrightnessCommit()}
-                        onTouchEnd={() => void handleBrightnessCommit()}
-                        onBlur={() => void handleBrightnessCommit()}
-                    />
-
-                    <div className="device-info-page__power-row">
-                        <ActionButton
-                            disabled={isLoading || isActionLoading}
-                            onClick={() => void handleLampPower(true)}
+                        <SelectField
+                            value={device?.locationId ?? 0}
+                            disabled={isLoading || isActionLoading || !device}
+                            onChange={(event) =>
+                                void handleMoveLocation(
+                                    Number(event.target.value),
+                                )
+                            }
                         >
-                            {isActionLoading ? "..." : "включить"}
+                            {locations.map((location) => (
+                                <option
+                                    key={location.locationId}
+                                    value={location.locationId}
+                                >
+                                    {location.locationName}
+                                </option>
+                            ))}
+                        </SelectField>
+                    </section>
+
+                    {isLamp && (
+                        <section className="device-info-page__lamp-actions">
+                            <input
+                                className="device-info-page__range"
+                                type="range"
+                                min="0"
+                                max="99"
+                                value={brightness}
+                                disabled={isLoading || isActionLoading}
+                                onChange={(event) =>
+                                    setBrightness(Number(event.target.value))
+                                }
+                                onMouseUp={() => void handleBrightnessCommit()}
+                                onTouchEnd={() => void handleBrightnessCommit()}
+                                onBlur={() => void handleBrightnessCommit()}
+                            />
+
+                            <div className="device-info-page__power-row">
+                                <ActionButton
+                                    disabled={isLoading || isActionLoading}
+                                    onClick={() => void handleLampPower(true)}
+                                >
+                                    {isActionLoading ? "..." : "включить"}
+                                </ActionButton>
+
+                                <ActionButton
+                                    variant="danger"
+                                    disabled={isLoading || isActionLoading}
+                                    onClick={() => void handleLampPower(false)}
+                                >
+                                    {isActionLoading ? "..." : "выключить"}
+                                </ActionButton>
+                            </div>
+                        </section>
+                    )}
+                    <section className="device-info-page__actions">
+                        <ActionButton onClick={() => navigate("/devices")}>
+                            все устройства
                         </ActionButton>
-
-                        <ActionButton
-                            variant="danger"
-                            disabled={isLoading || isActionLoading}
-                            onClick={() => void handleLampPower(false)}
-                        >
-                            {isActionLoading ? "..." : "выключить"}
-                        </ActionButton>
-                    </div>
-                </section>
+                    </section>
+                </>
             )}
-
-            <section className="device-info-page__actions">
-                <ActionButton onClick={() => navigate("/devices")}>
-                    все устройства
-                </ActionButton>
-            </section>
         </Page>
     );
 };

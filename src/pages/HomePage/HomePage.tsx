@@ -8,7 +8,7 @@ import type { DeviceDetails, LocationItem, SpaceItem } from "../../api/server";
 
 export const HomePage = () => {
     const [enabled, setEnabled] = useState(true);
-    const [brightness, setBrightness] = useState(65);
+    const [brightness, setBrightness] = useState(0);
     const [device, setDevice] = useState<DeviceDetails | null>(null);
     const [space, setSpace] = useState<SpaceItem | null>(null);
     const [location, setLocation] = useState<LocationItem | null>(null);
@@ -16,7 +16,6 @@ export const HomePage = () => {
     const [isActionLoading, setIsActionLoading] = useState(false);
     const [error, setError] = useState("");
     const spaceId = Number(sessionStorage.getItem("currentSpace"));
-    const locationId = Number(sessionStorage.getItem("currentLocation"));
     const navigate = useNavigate();
 
     const [devices, setDevices] = useState<DeviceDetails[] | null>(null);
@@ -50,17 +49,24 @@ export const HomePage = () => {
                 locationData[locationCounter].locationId,
             );
 
-            setDevice(devicesData[0]);
+            setDevice(devicesData[deviceCounter]);
 
             setDevices(devicesData);
+
+            const currentDevice = await server.getDevice(
+                devicesData[deviceCounter].deviceId,
+            );
+
+            if (currentDevice.isOn !== undefined && currentDevice.brightness !== undefined) {
+                setEnabled(currentDevice?.isOn);
+                setBrightness(currentDevice?.brightness);
+            }
         } catch {
             setError("Не удалось загрузить устройства.");
         } finally {
             setIsLoading(false);
         }
     };
-
-    console.log(devices);
 
     useEffect(() => {
         const timeoutId = window.setTimeout(() => {
@@ -85,13 +91,13 @@ export const HomePage = () => {
         }
     }, [space, location, device]);
 
-    const syncDevice = async (deviceId: number) => {
-        const nextDevice = await server.getDevice(deviceId);
+    // const syncDevice = async (deviceId: number) => {
+    //     const nextDevice = await server.getDevice(deviceId);
 
-        setDevice(nextDevice);
-        // setEnabled(nextDevice.isOn);
-        // setBrightness(nextDevice.brightness);
-    };
+    //     setDevice(nextDevice);
+    //     setEnabled(nextDevice.status === "online");
+    //     setBrightness(nextDevice.brightness);
+    // };
 
     const handleSelectDevice = (direction: string) => {
         if (!devices || devices.length === 0) return;
@@ -135,7 +141,7 @@ export const HomePage = () => {
                 await server.turnLampOff(device.deviceId);
             }
 
-            await syncDevice(device.deviceId);
+            // await syncDevice(device.deviceId);
         } catch {
             setError("Не удалось изменить состояние лампы.");
             // setEnabled(device.isOn);
@@ -156,7 +162,7 @@ export const HomePage = () => {
                 deviceId: device.deviceId,
                 brightness,
             });
-            await syncDevice(device.deviceId);
+            // await syncDevice(device.deviceId);
         } catch {
             setError("Не удалось изменить яркость.");
             // setBrightness(device.brightness);
